@@ -157,7 +157,31 @@ subtest 'Wing Mountain' => sub {
     is( Game::Osero::AI::Edge::State->new($data5, $w)->get_wing(),     0);
 };
 
+subtest 'index_line' => sub {
+    my $data1 = [
+            $b,
+            $b,
+            $b,
+            $b,
+            $b,
+            $b,
+            $b,
+            $b,
+        ];
+    my $edge = new_ok('Game::Osero::AI::Edge');
+    is($edge->line_index($data1), 6560);
 
-
+    my $data2 = [
+            $n,
+            $n,
+            $n,
+            $n,
+            $n,
+            $n,
+            $n,
+            $n,
+        ];
+    is($edge->line_index($data2), 0);
+};
 
 done_testing();

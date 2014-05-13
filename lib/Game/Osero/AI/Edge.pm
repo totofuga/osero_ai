@@ -1,3 +1,60 @@
+package Game::Osero::AI::Edge;
+
+use strict;
+use warnings;
+use base qw(Class::Accessor::Fast);
+
+__PACKAGE__->follow_best_practice();
+__PACKAGE__->mk_accessors(
+    qw( black_state_table white_state_table )
+);
+
+sub new {
+    my $class = shift;
+
+
+    my $self = $class->SUPER::new(@_);
+
+    $self->set_black_state_table( [] );
+    $self->set_white_state_table( [] );
+    $self->_calc_state_table([]);
+
+    return $self;
+}
+
+sub _calc_state_table {
+    my ($self, $edge_data) = @_;
+
+    if ( @$edge_data == 8 ) {
+        my $line_index = $self->line_index($edge_data);
+        $self->get_black_state_table->[$line_index] 
+            = Game::Osero::AI::Edge::State->new($edge_data, Game::Osero::BLACK);
+
+        $self->get_white_state_table->[$line_index] 
+            = Game::Osero::AI::Edge::State->new($edge_data, Game::Osero::WHITE);
+        return;
+    }
+
+    my @store_edge_data = @$edge_data;
+
+    $self->_calc_state_table( [ @store_edge_data, Game::Osero::BLACK] );
+    $self->_calc_state_table( [ @store_edge_data, Game::Osero::WHITE] );
+    $self->_calc_state_table( [ @store_edge_data, Game::Osero::BLANK] );
+}
+
+sub line_index {
+    my ($class, $edge_data) = @_;
+
+    return 3 * ( 3 * ( 3 * ( 3 * ( 3 * ( 3 * ( ( 3 * $edge_data->[0] ) +
+        $edge_data->[1]) +
+        $edge_data->[2]) +
+        $edge_data->[3]) +
+        $edge_data->[4]) +
+        $edge_data->[5]) +
+        $edge_data->[6]) +
+        $edge_data->[7];
+}
+
 package Game::Osero::AI::Edge::State;
 
 use strict;
@@ -75,11 +132,5 @@ sub _calc_wing_mountain {
     }
 }
 
-package Game::Osero::AI::Edge;
-use base qw(Class::Accessor::Fast);
-
-__PACKAGE__->mk_accessors(
-    qw( black_state_table white_state_table )
-);
 
 1;
