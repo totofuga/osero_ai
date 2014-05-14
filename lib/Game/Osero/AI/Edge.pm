@@ -4,10 +4,14 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 
+use Game::Osero;
+
 __PACKAGE__->follow_best_practice();
 __PACKAGE__->mk_accessors(
     qw( black_state_table white_state_table )
 );
+
+use List::Util qw(sum);
 
 sub new {
     my $class = shift;
@@ -20,6 +24,46 @@ sub new {
     $self->_calc_state_table([]);
 
     return $self;
+}
+
+sub evaluate {
+    my ($self, $osero) = @_;
+
+    my $state = $self->evaluate_state($osero);
+}
+
+sub evaluate_state {
+    my ($self, $osero) = @_;
+
+    my $color = $osero->get_turn();
+    my $edge_list = [
+        $self->create_top_edge($osero),
+        $self->create_bottom_edge($osero),
+        $self->create_left_edge($osero),
+        $self->create_right_edge($osero),
+    ];
+
+    my $state;
+    if ( $color == Game::Osero::BLACK ) { 
+        $state = sum map { $self->get_black_state_table()->[$self->line_index($_)] } @$edge_list;
+    } else {
+        $state = sum map { $self->get_white_state_table()->[$self->line_index($_)] } @$edge_list;
+    }
+
+    # 角のstableが重複するので取り除く
+    for ( 
+        $osero->get_board()->[0][0], 
+        $osero->get_board()->[0][7],
+        $osero->get_board()->[7][0],
+        $osero->get_board()->[7][7],
+    ) {
+        if ( $_ == $color ) {
+            $state->set_stable( $state->get_stable() - 1 );
+        }
+    }
+
+    return $state;
+
 }
 
 sub _calc_state_table {
@@ -55,11 +99,38 @@ sub line_index {
         $edge_data->[7];
 }
 
+sub create_top_edge {
+    my ($self, $osero) = @_;
+    return [ map { $_->[0] } @{$osero->get_board()} ];
+}
+
+sub create_bottom_edge {
+    my ($self, $osero) = @_;
+    return [ map { $_->[7] } @{$osero->get_board()} ];
+}
+
+sub create_left_edge {
+    my ($self, $osero) = @_;
+    return $osero->get_board()->[0];
+}
+
+sub create_right_edge {
+    my ($self, $osero) = @_;
+    return $osero->get_board()->[7];
+}
+
 package Game::Osero::AI::Edge::State;
 
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
+
+use Clone qw(clone);
+
+use overload 
+        '+' => \&_add,
+        fallback => 1;
+
 
 use Game::Osero;
 
@@ -132,5 +203,14 @@ sub _calc_wing_mountain {
     }
 }
 
+sub _add {
+    my ($lth, $rth) = @_;
+    my $ret = clone($lth);
+    for ( keys %{$ret} ) {
+        $ret->{$_} += $rth->{$_};
+    }
+
+    return $ret;
+}
 
 1;

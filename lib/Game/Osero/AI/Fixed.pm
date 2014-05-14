@@ -16,19 +16,19 @@ use constant FIXED_EVOLUTION_VALUES => [
     [ 100, -40, 20,  5,  5, 20, -40, 100 ],
 ];
 
-sub evoluate {
+sub evaluate {
     my ($class, $osero) = @_;
 
     my $value = -999999999;
-    my $max_evolute_pos;
+    my $max_evalute_pos;
     foreach ( @{$osero->get_can_drop_pos()} ){
         
         if ( $value < FIXED_EVOLUTION_VALUES->[$_->[0]]->[$_->[1]] ) {
-            $max_evolute_pos = $_;
+            $max_evalute_pos = $_;
             $value = FIXED_EVOLUTION_VALUES->[$_->[0]]->[$_->[1]];
         }
     }
-    return $max_evolute_pos;
+    return $max_evalute_pos;
 }
 
 1;

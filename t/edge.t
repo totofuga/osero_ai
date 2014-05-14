@@ -3,26 +3,9 @@ use Test::More;
 use Game::Osero;
 use Game::Osero::AI::Edge;
 
-my $state = Game::Osero::AI::Edge::State->new();
-
-
-subtest 'State' => sub {
-    $state->set_wing(1);
-    $state->set_mountain(2);
-    $state->set_stable(3);
-    $state->set_cdrop(4);
-
-    is($state->get_wing(), 1);
-    is($state->get_mountain(), 2);
-    is($state->get_stable(), 3);
-    is($state->get_cdrop(), 4);
-};
-
-
 my $n = Game::Osero::BLANK;
 my $b = Game::Osero::BLACK;
 my $w = Game::Osero::WHITE;
-
 
 subtest 'Stable' => sub {
     my $data1 = [
@@ -182,6 +165,71 @@ subtest 'index_line' => sub {
             $n,
         ];
     is($edge->line_index($data2), 0);
+};
+
+
+subtest 'create_edge' => sub {
+    my $osero = Game::Osero->new();
+
+    $osero->set_board(
+    [
+        [ $b, $w, $w, $b, $n, $n, $n, $n ],
+        [ $b, $w, $w, $b, $n, $n, $n, $n ],
+        [ $b, $w, $w, $b, $n, $n, $n, $n ],
+        [ $w, $w, $w, $b, $n, $n, $n, $b ],
+        [ $b, $w, $w, $b, $n, $n, $n, $n ],
+        [ $b, $w, $w, $b, $n, $n, $n, $n ],
+        [ $b, $w, $w, $b, $n, $n, $n, $n ],
+        [ $b, $n, $n, $n, $w, $b, $n, $n ],
+    ]);
+
+    my $edge = Game::Osero::AI::Edge->new();
+
+    is_deeply ( $edge->create_top_edge($osero),    [ $b, $b, $b, $w, $b, $b, $b, $b] );
+    is_deeply ( $edge->create_bottom_edge($osero), [ $n, $n, $n, $b, $n, $n, $n, $n] );
+    is_deeply ( $edge->create_left_edge($osero),   [ $b, $w, $w, $b, $n, $n, $n, $n] );
+    is_deeply ( $edge->create_right_edge($osero),  [ $b, $n, $n, $n, $w, $b, $n, $n] );
+};
+
+subtest 'add state' => sub {
+    my $state = Game::Osero::AI::Edge::State->new( [ $n, $n, $n, $n, $n, $n, $n, $n ], $b );
+    $state->set_wing(1);
+    $state->set_mountain(2);
+    $state->set_stable(3);
+    $state->set_cdrop(4);
+
+    my $sum_state = $state + $state;
+
+    is ( $sum_state->get_wing,     2);
+    is ( $sum_state->get_mountain, 4);
+    is ( $sum_state->get_stable,   6);
+    is ( $sum_state->get_cdrop,    8);
+};
+
+
+subtest 'evaluate state' => sub {
+    my $osero = Game::Osero->new();
+
+    $osero->set_board(
+    [
+        [ $n, $n, $b, $b, $b, $b, $b, $n ],
+        [ $b, $w, $w, $b, $n, $n, $n, $b ],
+        [ $b, $w, $w, $b, $n, $n, $n, $b ],
+        [ $w, $w, $w, $b, $n, $n, $n, $b ],
+        [ $b, $w, $w, $b, $n, $n, $n, $b ],
+        [ $b, $w, $w, $b, $n, $n, $n, $b ],
+        [ $b, $w, $w, $b, $n, $n, $n, $b ],
+        [ $b, $b, $n, $n, $w, $b, $n, $n ],
+    ]);
+
+
+    my $ai = Game::Osero::AI::Edge->new();
+
+    my $sum_state = $ai->evaluate_state($osero);
+
+    is($sum_state->get_wing, 1);
+    is($sum_state->get_mountain, 1);
+    is($sum_state->get_stable, 5);
 };
 
 done_testing();
