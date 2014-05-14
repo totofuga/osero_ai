@@ -5,7 +5,7 @@ use Game::Osero;
 
 use List::Util;
 
-use constant FIXED_EVOLUTION_VALUES => [
+use constant FIXED_EVALUTION_VALUES => [
     [ 100, -40, 20,  5,  5, 20, -40, 100 ],
     [ -40, -80, -1, -1, -1, -1, -80, -40 ],
     [  20,  -1,  5,  1,  1,  5,  -1,  20 ],
@@ -19,16 +19,24 @@ use constant FIXED_EVOLUTION_VALUES => [
 sub evaluate {
     my ($class, $osero) = @_;
 
-    my $value = -999999999;
-    my $max_evalute_pos;
-    foreach ( @{$osero->get_can_drop_pos()} ){
-        
-        if ( $value < FIXED_EVOLUTION_VALUES->[$_->[0]]->[$_->[1]] ) {
-            $max_evalute_pos = $_;
-            $value = FIXED_EVOLUTION_VALUES->[$_->[0]]->[$_->[1]];
+    my $evaluate_value;
+
+
+    foreach my $x (0.. 7) {
+        foreach my $y (0.. 7) {
+
+            my $color = $osero->get_board()->[$x][$y];
+
+            next if ( $color == Game::Osero::BLANK );
+
+            if ( $color == $osero->get_turn() ) {
+                $evaluate_value += FIXED_EVALUTION_VALUES->[$x][$y];
+            } else {
+                $evaluate_value -= FIXED_EVALUTION_VALUES->[$x][$y];
+            }
         }
     }
-    return $max_evalute_pos;
+    return $evaluate_value;
 }
 
 1;

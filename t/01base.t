@@ -5,15 +5,26 @@ use Test::More;
 use Game::Osero::AI::Fixed;
 use Game::Osero;
 
+*BLANK = \&Game::Osero::BLANK;
+*BLACK = \&Game::Osero::BLACK;
+*WHITE = \&Game::Osero::WHITE;
+
 my $osero = Game::Osero->new();
 
-my $pos = Game::Osero::AI::Fixed->evaluate($osero);
-is(Game::Osero::AI::Fixed::FIXED_EVOLUTION_VALUES()->[$pos->[0]]->[$pos->[1]], 1);
+$osero->set_board(
+[
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ], 
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ],
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ],
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ],
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ],
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ],
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), WHITE(), ],
+    [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLACK(), BLACK(), ],
+]);
 
-$osero->drop($pos->[0], $pos->[1]);
-$osero->set_turn( $osero->get_rival_turn() );
-
-$pos = Game::Osero::AI::Fixed->evaluate($osero);
-is(Game::Osero::AI::Fixed::FIXED_EVOLUTION_VALUES()->[$pos->[0]]->[$pos->[1]], 5);
+is(Game::Osero::AI::Fixed->evaluate($osero), 160);
+$osero->set_turn($osero->get_rival_turn);
+is(Game::Osero::AI::Fixed->evaluate($osero), -160);
 
 done_testing();

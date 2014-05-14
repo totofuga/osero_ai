@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
 
+use interface 'Game::Osero::AI';
 use Game::Osero;
 
 __PACKAGE__->follow_best_practice();
@@ -12,6 +13,13 @@ __PACKAGE__->mk_accessors(
 );
 
 use List::Util qw(sum);
+
+use constant {
+       DEF_STABLE_FACTOR =>   60,
+       DEF_WING_FACTOR   =>  -20,
+       DEF_MOUNTAIN_FACTOR => -1,
+};
+
 
 sub new {
     my $class = shift;
@@ -30,6 +38,10 @@ sub evaluate {
     my ($self, $osero) = @_;
 
     my $state = $self->evaluate_state($osero);
+
+    return $state->get_stable() * DEF_STABLE_FACTOR +
+           $state->get_wing() * DEF_WING_FACTOR +
+           $state->get_mountain() * $state->DEF_MOUNTAIN_FACTOR;
 }
 
 sub evaluate_state {
