@@ -35,9 +35,11 @@ sub new {
 }
 
 sub evaluate {
-    my ($self, $osero) = @_;
+    my ($self, $osero, $color) = @_;
 
-    my $state = $self->evaluate_state($osero);
+    $color = $osero->get_turn() unless defined $color;
+
+    my $state = $self->evaluate_state($osero, $color);
 
     return $state->get_stable() * DEF_STABLE_FACTOR +
            $state->get_wing() * DEF_WING_FACTOR +
@@ -45,9 +47,10 @@ sub evaluate {
 }
 
 sub evaluate_state {
-    my ($self, $osero) = @_;
+    my ($self, $osero, $color) = @_;
 
-    my $color = $osero->get_turn();
+    $color = $osero->get_turn() unless defined $color;
+
     my $edge_list = [
         $self->create_top_edge($osero),
         $self->create_bottom_edge($osero),

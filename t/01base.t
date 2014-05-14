@@ -23,8 +23,10 @@ $osero->set_board(
     [ BLACK(), BLANK(), BLANK(), BLANK(), BLANK(), BLANK(), BLACK(), BLACK(), ],
 ]);
 
-is(Game::Osero::AI::Fixed->evaluate($osero), 160);
+
+my $fixed_ai = new_ok('Game::Osero::AI::Fixed');
+is($fixed_ai->evaluate($osero), 160);
 $osero->set_turn($osero->get_rival_turn);
-is(Game::Osero::AI::Fixed->evaluate($osero), -160);
+is($fixed_ai->evaluate($osero), -160);
 
 done_testing();
