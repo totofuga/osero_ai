@@ -17,7 +17,7 @@ sub evaluate {
 
     my $score = 0;
     for my $x ( 0..7 ) {
-        for $y ( 0..7 ) {
+        for my $y ( 0..7 ) {
             next if $osero->get_board()->[$x][$y] == Game::Osero::BLANK;
 
             if ( $osero->get_board()->[$x][$y] == $color ) {
