@@ -40,6 +40,7 @@ if you don't export anything, such as for a purely object-oriented module.
 =cut
 
 sub evaluate {
+    my ($self, $osero, $color) = @_;
 }
 
 =head1 AUTHOR
