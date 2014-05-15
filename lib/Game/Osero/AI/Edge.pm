@@ -43,7 +43,7 @@ sub evaluate {
 
     return $state->get_stable() * DEF_STABLE_FACTOR +
            $state->get_wing() * DEF_WING_FACTOR +
-           $state->get_mountain() * $state->DEF_MOUNTAIN_FACTOR;
+           $state->get_mountain() * DEF_MOUNTAIN_FACTOR;
 }
 
 sub evaluate_state {
